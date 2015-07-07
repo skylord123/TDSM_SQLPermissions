@@ -2,40 +2,56 @@
 using tdsm.api.Command;
 using tdsm.api.Plugin;
 
-namespace BareBones
+namespace Sithous
 {
-    public class SQLPermissions : BasePlugin
-    {
-        public SQLPermissions()
-        {
-            this.TDSMBuild = 1;
-            this.Version = "1";
-            this.Author = "TDSM";
-            this.Name = "Simple name";
-            this.Description = "This plugin does these awesome things!";
-        }
+	public class SQLPermissions : BasePlugin
+	{
+		private SqlSupplier _instance;
 
-        protected override void Initialized(object state)
-        {
-            AddCommand("commandname")
-                .WithAccessLevel(AccessLevel.PLAYER)
-                .WithDescription("My command description")
-                .WithHelpText("<name>")
-                .WithHelpText("<something else> <maybe more>")
-                .WithPermissionNode("BareBones.commandname")
-                .Calls(MyCustomCommandCallback);
-        }
+		public SQLPermissions ()
+		{
+			this.TDSMBuild = 2;
+			this.Version = "1";
+			this.Author = "Skylord123 & DeathCradle";
+			this.Name = "SQL permissions";
+			this.Description = "Allows TDSM to run via permissions in a SQL database";
+		}
 
-        void MyCustomCommandCallback(ISender sender, ArgumentList args)
-        {
-            //Your implementation
-        }
+		protected override void Initialized (object state)
+		{
+			//Reload the spplier
+			if (_instance == null)
+			{
+				_instance = new SqlSupplier ("", 1234);
+				if (_instance.Load ())
+				{
+					Tools.WriteLine ("Connected to the SQL permission database");
+				}
+				else
+				{
+					Tools.WriteLine ("Cannot load permissions");
+					return;
+				}
+			}
+			else
+			{
+				if (!_instance.Reload ())
+				{
+					Tools.WriteLine ("Cannot reload permissions");
+					return;
+				}
+			}
+		}
 
-        [Hook(HookOrder.NORMAL)]
-        void MyFunctionNameThatDoesntMatter(ref HookContext ctx, ref HookArgs.PlayerEnteredGame args)
-        {
-            //Your implementation
-        }
-    }
+		protected override void Enabled ()
+		{
+			base.Enabled ();
+
+			//Get TDSM to swap the current permission handler to our own
+			tdsm.api.Permissions.PermissionsManager.SetHandler (_instance);
+
+			Tools.WriteLine ("SQL permissions engaged.");
+		}
+	}
 }
 
