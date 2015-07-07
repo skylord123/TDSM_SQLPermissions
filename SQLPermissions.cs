@@ -4,9 +4,9 @@ using tdsm.api.Plugin;
 
 namespace BareBones
 {
-    public class YourPlugin : BasePlugin
+    public class SQLPermissions : BasePlugin
     {
-        public YourPlugin()
+        public SQLPermissions()
         {
             this.TDSMBuild = 1;
             this.Version = "1";
