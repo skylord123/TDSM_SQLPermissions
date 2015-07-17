@@ -1,6 +1,4 @@
-﻿using tdsm.api;
-using tdsm.api.Command;
-using tdsm.api.Plugin;
+﻿using TDSM.API.Plugin;
 
 namespace Sithous
 {
@@ -19,39 +17,24 @@ namespace Sithous
 
 		protected override void Initialized (object state)
 		{
-			//Reload the spplier
-			if (_instance == null)
-			{
-				_instance = new SqlSupplier ("", 1234);
-				if (_instance.Load ())
-				{
-					Tools.WriteLine ("Connected to the SQL permission database");
-				}
-				else
-				{
-					Tools.WriteLine ("Cannot load permissions");
-					return;
-				}
-			}
-			else
-			{
-				if (!_instance.Reload ())
-				{
-					Tools.WriteLine ("Cannot reload permissions");
-					return;
-				}
-			}
+
 		}
 
 		protected override void Enabled ()
 		{
 			base.Enabled ();
+        }
 
-			//Get TDSM to swap the current permission handler to our own
-			tdsm.api.Permissions.PermissionsManager.SetHandler (_instance);
-
-			Tools.WriteLine ("SQL permissions engaged.");
-		}
-	}
+        [Hook]
+        void OnStateChange(ref HookContext ctx, ref HookArgs.ServerStateChange args)
+        {
+            if (args.ServerChangeState == TDSM.API.ServerState.Initialising)
+            {
+                //Data connectors must have loaded by now
+                //Get TDSM to swap the current permission handler to our own
+                TDSM.API.Permissions.PermissionsManager.SetHandler(_instance);
+            }
+        }
+    }
 }
 

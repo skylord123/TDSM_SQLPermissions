@@ -1,76 +1,26 @@
 ﻿using System;
-using tdsm.api.Permissions;
-using tdsm.api;
 using Sithouse;
+using TDSM.API.Permissions;
+using TDSM.API.Data;
+using TDSM.API;
 
 namespace Sithous
 {
-	public sealed class SqlSupplier : tdsm.api.Permissions.IPermissionHandler
-	{
-		private string _host;
-		private int _port;
+	public sealed class SqlSupplier : TDSM.API.Permissions.IPermissionHandler
+    {
+        public const String SQLSafePluginName = "SqlPermissions";
 
-		private ISql _database;
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Sithous.SqlSupplier"/> class.
-		/// </summary>
-		/// <param name="port">Port.</param>
-		public SqlSupplier (string host, int port)
-		//typically this is a connection string, but for people who have no idea this will make it simple
-		{
-			this._host = host;
-			this._port = port;
-		}
-
-		/// <summary>
-		/// Prepares the instance ready for use.
-		/// </summary>
-		public bool Load ()
-		{
-			//Find the database type
-			var fmt = "mysql".ToLower (); //TODO: properties file
-			_database = GetFormat (fmt);
-			if (null == _database)
-			{
-				Tools.WriteLine ("Cannot find database format: " + fmt);
-				return false;
-			}
-
-			//Get a connection
-			if (!_database.OpenConnection (_host, _port))
-			{
-				Tools.WriteLine ("Failed to open a connection to the permission database");
-				return false;
-			}
-
-			return true;
-		}
-
-		/// <summary>
-		/// Reload this instance.
-		/// </summary>
-		public bool Reload ()
-		{
-			if (null != _database) _database.CloseConnection ();
-			return Load ();
-		}
-
-		#region "Sql formats"
-
-		private ISql GetFormat (string format)
-		{
-			//Cycle types in assembly and initialise a match.
-			return null;
-		}
-
-		#endregion
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Sithous.SqlSupplier"/> class.
+        /// </summary>
+        public SqlSupplier() { }
 
 		#region "TDSM calls"
 
 		public Permission IsPermitted (string node, BasePlayer player)
 		{
 			//Call sql parameterised
+            
 
 			return Permission.Denied;
 		}
@@ -82,7 +32,112 @@ namespace Sithous
 			return Permission.Denied;
 		}
 
-		#endregion
-	}
+        #endregion
+    }
+
+    public class GroupDatabase
+    {
+        private class TableDefinition
+        {
+            public const String TableName = "Groups";
+
+            public static class ColumnNames
+            {
+                public const String Id = "Id";
+                public const String Name = "Name";
+                public const String Parent = "Parent";
+                public const String Chat_Red = "Chat_Red";
+                public const String Chat_Green = "Chat_Green";
+                public const String Chat_Blue = "Chat_Blue";
+                public const String Chat_Prefix = "Chat_Prefix";
+                public const String Chat_Suffix = "Chat_Suffix";
+            }
+
+            // `id` int(11) NOT NULL AUTO_INCREMENT,
+            // `name` varchar(255) NOT NULL,
+            // `parent` int(255) DEFAULT NULL,
+            // `chat_color` varchar(11) DEFAULT NULL,
+            // `chat_prefix` varchar(255) DEFAULT NULL,
+            // `chat_suffix` varchar(255) DEFAULT NULL,
+            // PRIMARY KEY(`id`),
+            // KEY `restrict_group_parent` (`parent`),
+            // CONSTRAINT `restrict_group_parent` FOREIGN KEY(`parent`) REFERENCES `Restrict_Group` (`id`) ON DELETE SET NULL
+            //) ENGINE=InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = latin1;
+
+            public static readonly TableColumn[] Columns = new TableColumn[]
+            {
+                new TableColumn(ColumnNames.Id, typeof(Int32), true, true),
+                new TableColumn(ColumnNames.Name, typeof(String), 255),
+                new TableColumn(ColumnNames.Parent, typeof(String), 255),
+                new TableColumn(ColumnNames.Chat_Red, typeof(Byte)),
+                new TableColumn(ColumnNames.Chat_Green, typeof(Byte)),
+                new TableColumn(ColumnNames.Chat_Blue, typeof(Byte)),
+                new TableColumn(ColumnNames.Chat_Prefix, typeof(Byte)),
+                new TableColumn(ColumnNames.Chat_Suffix, typeof(Byte))
+            };
+
+            public static bool Exists()
+            {
+                using (var bl = Storage.GetBuilder(SqlSupplier.SQLSafePluginName))
+                {
+                    bl.TableExists(TableName);
+
+                    return Storage.Execute(bl);
+                }
+            }
+
+            public static bool Create()
+            {
+                using (var bl = Storage.GetBuilder(SqlSupplier.SQLSafePluginName))
+                {
+                    bl.TableCreate(TableName, Columns);
+
+                    return Storage.ExecuteNonQuery(bl) > 0;
+                }
+            }
+        }
+    }
+
+    public class NodesTable
+    {
+        private class TableDefinition
+        {
+            public const String TableName = "Groups";
+
+            public static class ColumnNames
+            {
+                public const String Id = "Id";
+                public const String Name = "Node";
+                public const String Deny = "Deny";
+            }
+
+            public static readonly TableColumn[] Columns = new TableColumn[]
+            {
+                new TableColumn(ColumnNames.Id, typeof(Int32), true, true),
+                new TableColumn(ColumnNames.Name, typeof(String), 255),
+                new TableColumn(ColumnNames.Deny, typeof(Boolean))
+            };
+
+            public static bool Exists()
+            {
+                using (var bl = Storage.GetBuilder(SqlSupplier.SQLSafePluginName))
+                {
+                    bl.TableExists(TableName);
+
+                    return Storage.Execute(bl);
+                }
+            }
+
+            public static bool Create()
+            {
+                using (var bl = Storage.GetBuilder(SqlSupplier.SQLSafePluginName))
+                {
+                    bl.TableCreate(TableName, Columns);
+
+                    return Storage.ExecuteNonQuery(bl) > 0;
+                }
+            }
+        }
+    }
 }
 

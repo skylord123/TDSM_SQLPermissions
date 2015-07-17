@@ -1,0 +1,13 @@
+*.exe
+bin/Debug/NLua.dll
+bin/Debug/tdsm.api.dll
+*.pdb
+obj/Debug/BareBones.dll
+bin/Debug/BareBones.dll
+bin/Debug/Mono.Nat.dll
+*.cache
+obj/Debug/SQLPermissions.csproj.FileListAbsolute.txt
+bin/Debug/KopiLua.dll
+*.cache
+obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache

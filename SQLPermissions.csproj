@@ -5,8 +5,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{61CDB3B7-4961-477B-B241-917030680C60}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>BareBones</RootNamespace>
-    <AssemblyName>BareBones</AssemblyName>
+    <RootNamespace>SQLPermissions</RootNamespace>
+    <AssemblyName>SQLPermissions</AssemblyName>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
@@ -34,9 +34,6 @@
     <Reference Include="tdsm">
       <HintPath>..\Terraria-s-Dedicated-Server-Mod\Binaries\tdsm.exe</HintPath>
     </Reference>
-    <Reference Include="tdsm.api">
-      <HintPath>..\Terraria-s-Dedicated-Server-Mod\tdsm-api\bin\x86\Debug\tdsm.api.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -46,8 +43,11 @@
     <Compile Include="Formats\MySql\MySql.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Formats\" />
-    <Folder Include="Formats\MySql\" />
+    <ProjectReference Include="..\Terraria-s-Dedicated-Server-Mod\tdsm-api\tdsm-api.csproj">
+      <Project>{a1f792b2-5d80-4de4-b5db-7a05dbeabd60}</Project>
+      <Name>tdsm-api</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
