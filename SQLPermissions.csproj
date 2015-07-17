@@ -39,8 +39,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SQLPermissions.cs" />
     <Compile Include="SqlSupplier.cs" />
-    <Compile Include="Formats\ISql.cs" />
-    <Compile Include="Formats\MySql\MySql.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
